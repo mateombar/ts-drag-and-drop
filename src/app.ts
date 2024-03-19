@@ -18,16 +18,14 @@ function validate(validatableInput: Validatable) {
     typeof validatableInput.value === "string"
   ) {
     isValid =
-      isValid &&
-      validatableInput.value.length > validatableInput.minLength;
+      isValid && validatableInput.value.length > validatableInput.minLength;
   }
   if (
     validatableInput.maxLength != null &&
     typeof validatableInput.value === "string"
   ) {
     isValid =
-      isValid &&
-      validatableInput.value.length < validatableInput.maxLength;
+      isValid && validatableInput.value.length < validatableInput.maxLength;
   }
   if (
     validatableInput.min != null &&
@@ -55,6 +53,39 @@ function autobind(_: any, _2: string, descriptor: PropertyDescriptor) {
     },
   };
   return adjDescriptor;
+}
+
+class ProjectList {
+  templateElement: HTMLTemplateElement;
+  hostElement: HTMLDivElement;
+  sectionElement: HTMLElement;
+
+  constructor(private type: "active" | "finished") {
+    this.templateElement = document.getElementById(
+      "project-list"
+    )! as HTMLTemplateElement;
+    this.hostElement = document.getElementById("app")! as HTMLDivElement;
+
+    const importedNode = document.importNode(
+      this.templateElement.content,
+      true
+    );
+    this.sectionElement = importedNode.firstElementChild as HTMLElement;
+    this.sectionElement.id = `${this.type}-projects`;
+    this.attach();
+    this.renderContent();
+  }
+
+  private renderContent() {
+    const listId = `${this.type}-projects-list`;
+    this.sectionElement.querySelector("ul")!.id = listId;
+    this.sectionElement.querySelector("h2")!.textContent =
+      this.type.toUpperCase() + " PROJECTS";
+  }
+
+  private attach() {
+    this.hostElement.insertAdjacentElement("beforeend", this.sectionElement);
+  }
 }
 
 // Project Input Class
@@ -116,7 +147,7 @@ class ProjectInput {
       max: 10,
     };
     console.log(titleValidatable, descriptionValidatable, peopleValidatable);
-    
+
     if (
       validate(titleValidatable) &&
       validate(descriptionValidatable) &&
@@ -124,7 +155,7 @@ class ProjectInput {
     ) {
       return [enteredTitle, enteredDescription, Number(enteredPeople)];
     }
-    alert('Invalid')
+    alert("Invalid");
     return;
   }
 
@@ -156,3 +187,5 @@ class ProjectInput {
 }
 
 const prjInput = new ProjectInput();
+const activeProjectList = new ProjectList("active");
+const finishedProjectList = new ProjectList("finished");
